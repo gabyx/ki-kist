@@ -4,7 +4,7 @@ set fallback := true
 set shell := ["bash", "-cue"]
 root_dir := justfile_directory()
 
-api-job:
+api-store-key:
     cd "{{root_dir}}" && \
         http --form --multipart PUT \
         http://localhost:8080/api/job \

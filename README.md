@@ -64,6 +64,8 @@ location of files:
     public and encrypted private keys.
   - [`./client`](components/client): The command-line interface which can talk
     to the server `api`.
+  - [`./common`](components/common): A common Rust library acting as glue
+    between `api` and `client`.
 - [`./manifests`](manifests): All Kubernetes (`k8s`) manifests which are needed
   to deploy the `api` and its accompanied micro-services (e.g database, reverse
   proxy etc.) to a Kubernetes cluster.

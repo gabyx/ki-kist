@@ -16,13 +16,6 @@ pub enum Error {
         backtrace: Backtrace,
     },
 
-    #[snafu(context(suffix(ErrorCtx)), display("Queue Error: {message}"))]
-    QueueError {
-        message: String,
-        source: amqprs::error::Error,
-        backtrace: Backtrace,
-    },
-
     #[snafu(whatever, display("Generic Error: {message}"))]
     GenericError {
         message: String,

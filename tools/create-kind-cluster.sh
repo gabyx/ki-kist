@@ -12,7 +12,7 @@ cluster_name="$1"
 
 # 1. Create registry container unless it already exists
 reg_name="kind-registry"
-reg_port='5001'
+reg_port='5002'
 
 printInfo "Creating local cluster '$cluster_name' with registry '$reg_name' -> 'localhost:$reg_port'."
 

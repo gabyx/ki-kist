@@ -68,11 +68,6 @@ impl From<result::Error> for super::Error {
                 source: _,
                 backtrace: _,
             } => super::error!(Status::InternalServerError, "IO Error."),
-            result::Error::QueueError {
-                message: _,
-                source: _,
-                backtrace: _,
-            } => super::error!(Status::InternalServerError, "Queue Error."),
             result::Error::DBError {
                 message: _,
                 source: _,

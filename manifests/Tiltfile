@@ -11,6 +11,10 @@ load(
 
 settings = load_settings()
 
+# Note: Tilt will always prefer the local registry
+# on the cluster (it autodetects it.)
+# To use the normal `ttl.sh` registry run a cluster without a registry,
+# and set a config value accordingly:
 if settings["use-local-registry"]:
     # Use local docker registry run in the cluster.
     default_registry("localhost:5001")
@@ -29,13 +33,6 @@ for p in component_dirs:
         load_dynamic(f)
 
 # All other needed stuff such as database and the rabbitmq queue.
-config = get_component_config(name="rabbitmq")
-k8s_yaml(kustomize(config["manifest-dir"]))
-k8s_resource(workload=config["name"], port_forwards=[15672, 5672])
-
-config = get_component_config(name="mongodb")
-k8s_yaml(kustomize(config["manifest-dir"]))
-k8s_resource(workload=config["name"], port_forwards=27017)
 
 config = get_component_config(name="postgresdb")
 k8s_yaml(kustomize(config["manifest-dir"]))
