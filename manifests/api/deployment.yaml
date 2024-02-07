@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: kikist
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      initContainers:
+        # Workaround to make blob-storage accessible, because the permissions
+        # need to be set and correct.
+        # `fsGroup` does not work...
+        - name: blob-storage-permissions
+          image: alpine:latest
+          command: ["sh", "/scripts/set-permissions.sh", "/data"]
+          volumeMounts:
+            - name: blob-storage
+              mountPath: /data
+            - name: blob-storage-permissions
+              mountPath: /scripts
+
+        - name: db-migration
+          image: api-db-migration:latest
+          envFrom:
+            - configMapRef:
+                name: db-config
+
+      containers:
+        - name: service
+          image: api-service:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: db-config
+            - configMapRef:
+                name: queue-config
+            - configMapRef:
+                name: api-config
+          volumeMounts:
+            - mountPath: /data/blob-storage
+              name: blob-storage
+      securityContext:
+        fsGroup: 1000
+
+      volumes:
+        - name: blob-storage
+          persistentVolumeClaim:
+            claimName: blob-storage-disk-claim
+
+        - name: blob-storage-permissions
+          configMap:
+            name: blob-storage-disk-permissions
+            mode: 0744

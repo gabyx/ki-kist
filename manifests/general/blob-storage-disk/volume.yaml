@@ -1,0 +1,30 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: blob-storage-disk
+  namespace: kikist
+  labels:
+    type: local
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: 200M
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/blob-storage"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: blob-storage-disk-claim
+  namespace: kikist
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 200M

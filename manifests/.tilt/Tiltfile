@@ -1,0 +1,103 @@
+root_dir = str(local(["git", "rev-parse", "--show-toplevel"])).strip()
+
+
+def get_component_path(name=None, *args):
+    if name:
+        return os.path.join(root_dir, "components", name, *args)
+    else:
+        return os.path.join(root_dir, "components")
+
+
+component_dirs = (
+    str(
+        local(
+            [
+                "find",
+                get_component_path(),
+                "-mindepth",
+                "1",
+                "-maxdepth",
+                "1",
+                "-type",
+                "d",
+            ]
+        )
+    )
+    .strip()
+    .split()
+)
+
+
+def get_component_image_settings(name):
+    # Every component can build multiple docker images.
+    # So far supported images are:
+    # - `service`: The actual service image (either in docker/ or in `docker/service`).
+    # - `db-migration`: The optional db-migration image in `docker/db-migration`
+
+    def create_img_settings(dockerfile, comp_name, image_type):
+        executable_name = "%s-%s" % (comp_name, image_type)
+        return {
+            "dockerfile": dockerfile,
+            "ref": executable_name,
+            "image_type": image_type,
+            "executable_name": executable_name,
+            "build-args": {
+                "COMPONENT": comp_name,
+                "IMAGE_TYPE": image_type,
+                "TARGET": executable_name,
+            },
+        }
+
+    image_types = ["service", "db-migration"]
+    dockerfiles = {t: None for t in image_types}
+
+    p = get_component_path(name, "docker", "Dockerfile")
+    if os.path.exists(p):
+        dockerfiles["service"] = create_img_settings(p, name, "service")
+
+        for t in image_types:
+            if os.path.exists(get_component_path(name, "docker", t)):
+                fail("Not conforming to docker image structure.")
+    else:
+        for image_type in image_types:
+            p = get_component_path(name, "docker", image_type, "Dockerfile")
+            if os.path.exists(p):
+                dockerfiles[image_type] = create_img_settings(p, name, image_type)
+
+    return dockerfiles
+
+
+def get_manifest_path(comp_name, *args):
+    return os.path.join(root_dir, "manifests", comp_name, *args)
+
+
+def get_component_config(tiltfile=None, name=None):
+    if tiltfile != None:
+        if not os.path.exists(tiltfile):
+            fail("Tiltfile:", tiltfile, "does not exist.")
+        name = os.path.basename(os.path.dirname(tiltfile))
+
+    elif not name:
+        fail("Name not given")
+
+    dir = get_component_path(name)
+    manifest_dir = get_manifest_path(name)
+
+    return {
+        "name": name,
+        "dir": dir,
+        "manifest-dir": manifest_dir,
+        "images": get_component_image_settings(name),
+    }
+
+
+def load_settings():
+    env_file = os.path.join(config.main_dir, ".env.yaml")
+    return read_yaml(
+        env_file,
+        default={
+            "use-local-registry": False,
+            "build-type": "release",
+            "enable-backtrace": "0",
+        },
+    )

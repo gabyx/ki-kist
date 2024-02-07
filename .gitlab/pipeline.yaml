@@ -1,0 +1,38 @@
+stages:
+  - check
+
+.defaults-rules: &defaults-rules
+  - if: "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature|bugfix/ || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    when: always
+
+format:
+  stage: check
+  image: docker:24
+  rules:
+    - *defaults-rules
+  services:
+    - docker:24-dind
+  variables:
+    GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
+  script:
+    - apk add git jq curl bash just findutils parallel
+    - just format
+
+build:
+  stage: check
+  image: nixpkgs/nix-flakes:nixos-22.11
+  rules:
+    - *defaults-rules
+  script:
+    - git config --global safe.directories "*"
+    - nix develop . --command just --set parallel true build
+# build-image:
+#   stage: check
+#   image: docker:24
+#   rules:
+#     - *defaults-rules
+#   services:
+#     - docker:24-dind
+#   script:
+#     - apk add git bash just findutils parallel
+#     - just --set parallel true build-image

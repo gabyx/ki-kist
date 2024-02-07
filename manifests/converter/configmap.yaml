@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: converter-config
+  namespace: kikist
+  labels:
+    app: converter
+data:
+  BLOB_STORAGE_PATH: /data/blob-storage

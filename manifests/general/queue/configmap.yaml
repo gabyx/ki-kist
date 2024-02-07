@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: queue-config
+  namespace: kikist
+data:
+  RABBITMQ_HOST: rabbitmq.kikist
+  RABBITMQ_USERNAME: guest
+  RABBITMQ_PASSWORD: guest
+
+  QUEUE_JOBS: kikist.jobs
+  QUEUE_JOBS_DURABLE: "false"
+  QUEUE_JOBS_ROUTING_KEY: kikist.job
+
+  QUEUE_STATUS: kikist.status
+  QUEUE_STATUS_DURABLE: "false"
+  QUEUE_STATUS_ROUTING_KEY: kikist.status
+
+  EXCHANGE_NAME: kikist.exchange

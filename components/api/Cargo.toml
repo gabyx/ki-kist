@@ -1,0 +1,46 @@
+[package]
+name = "api"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "api-service"
+path = "src/service/main.rs"
+
+[[bin]]
+name = "api-db-migration"
+path = "src/db-migration/main.rs"
+
+[dependencies]
+common = {path="../common"}
+dotenvy = "0.15"
+slog = { version = "2.7.0", features = ["max_level_trace", "release_max_level_info"] }
+amqprs = "1.5.1"
+uuid = "1.6.1"
+tempfile = "3.9.0"
+diesel_migrations = "2.1.0"
+
+[dependencies.snafu]
+version = "0.8.0"
+features = ['std', 'backtrace']
+
+[dependencies.rocket]
+version = "=0.5.0-rc.3"
+features = ['json']
+
+[dependencies.serde]
+version = "1.0"
+features = ['derive']
+
+[dependencies.diesel]
+version = "2.1.0"
+features = ["postgres"]
+
+[profile.release]
+strip = true  # Automatically strip symbols from the binary.
+opt-level = "z"  # Optimize for size.
+
+[features]
+default = ["debug-handlers"]
+debug-handlers = []

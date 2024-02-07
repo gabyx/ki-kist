@@ -1,0 +1,77 @@
+/*
+[dependencies]
+[dependencies.rocket]
+version = "=0.5.0"
+features = ['json']
+*/
+
+use rocket::fairing::{Fairing, Info, Kind};
+use std::{
+    sync::{
+        mpsc::{self, Sender, TryRecvError},
+        Mutex,
+    },
+    thread::{self, JoinHandle},
+    time::Duration,
+};
+
+enum Notification {
+    Cancel,
+}
+
+struct StatusConsumerShutdown {
+    handle: Mutex<Option<JoinHandle<()>>>,
+    tx: Sender<Notification>,
+}
+
+#[rocket::async_trait]
+impl Fairing for StatusConsumerShutdown {
+    fn info(&self) -> Info {
+        Info {
+            name: "Status Consumer Shutdown Fairing",
+            kind: Kind::Shutdown,
+        }
+    }
+
+    /// Cannot change this trait to `self`......
+    async fn on_shutdown(&self, _rocket: &rocket::Rocket<rocket::Orbit>) {
+        if let Err(e) = self.tx.send(Notification::Cancel) {
+            println!("Could not send cancel notification: error:\n{}", e);
+        }
+
+        if let Some(handle) = self.handle.lock().unwrap().take() {
+            handle.join().unwrap();
+        }
+    }
+}
+
+pub fn spawn_status_consumer() -> impl Fairing {
+    let (tx, rx) = mpsc::channel::<Notification>();
+
+    let handle = thread::spawn(move || loop {
+        println!("Working...");
+        thread::sleep(Duration::from_millis(500));
+
+        match rx.try_recv() {
+            Ok(Notification::Cancel) => {
+                println!("Received cancelation -> Terminating.");
+                break;
+            }
+            Err(TryRecvError::Disconnected) => {
+                println!("Parent thread disconnected -> Terminating.");
+                break;
+            }
+            Err(TryRecvError::Empty) => {}
+        }
+    });
+
+    return StatusConsumerShutdown {
+        handle: Mutex::new(Some(handle)),
+        tx,
+    };
+}
+
+fn main() {
+    let shutdown_fairing = spawn_status_consumer();
+    rocket::build().attach(shutdown_fairing).launch();
+}
