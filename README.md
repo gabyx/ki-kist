@@ -228,6 +228,17 @@ You can inspect continuously the state of the cluster with `k9s` and also watch
 
 ## Development
 
+### Tests
+
+Note: Currently not a lot of test have been written. The goal is the following:
+
+- **Unit Tests**: Should be written without real database access. That means we
+  need to wrap our [`State`](../components/api/src/service/state.rs) for tests
+  introducing a mock trait which uses a file database. Currently I don't know
+  how to do that with Diesel.
+- **Integration Tests**: Use the `client` be directly for integration tests
+  against all endpoints.
+
 ### Debugging in Rust
 
 - Either use VS Code with the rust extension or

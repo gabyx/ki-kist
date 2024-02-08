@@ -5,7 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [[bin]]
-name = "converter-service"
+name = "client"
 path = "src/main.rs"
 
 [dependencies]
@@ -16,6 +16,10 @@ dotenv = "0.15.0"
 tokio = "1.35.0"
 async-std = "1.12.0"
 async-trait = "0.1.75"
+
+[dependencies.clap]
+version = "4.5.0"
+features = ["derive"]
 
 [dependencies.uuid]
 version = "1.6.1"
