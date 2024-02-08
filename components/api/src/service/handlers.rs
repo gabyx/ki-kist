@@ -41,14 +41,16 @@ async fn store_key(
     {
         debug!(s.log, "Insert into database.");
         let mut d = s.db.lock().await;
+
         db::transactions::insert_asymmetric_key_pair(
             &s.log,
             d.deref_mut(),
             user_id,
             key_id.unwrap(),
             &key_pair,
-        )?;
-        // .log(&s.log)?
+        )
+        .log(&s.log)
+        .map_err(|e| response::Error::from(e))?
     }
 
     return json::success!(StoreKeyResponse {
@@ -74,8 +76,10 @@ async fn get_key(
 
     let key = {
         let mut d = s.db.lock().await;
+
         db::transactions::get_asymmetric_key_pair(&s.log, d.deref_mut(), user_id, key_id.unwrap())
-            .log(&s.log)?
+            .log(&s.log)
+            .map_err(|e| response::Error::from(e))?
     };
 
     return json::success!(GetKeyResponse(key));

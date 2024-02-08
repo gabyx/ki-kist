@@ -5,7 +5,7 @@ use super::{
 use crate::{
     keys::{AsymmetricKeyPair, AsymmetricKeyPairView},
     log::{info, Logger},
-    result::{self, Res},
+    result::{self},
 };
 use diesel::{
     self, result::Error::NotFound, BelongingToDsl, ExpressionMethods, PgConnection, QueryDsl,
@@ -14,8 +14,21 @@ use diesel::{
 use snafu::prelude::*;
 use uuid::Uuid;
 
-// Insert a new user into the database.
-pub fn insert_new_user(conn: &mut PgConnection, user_id: &str) -> Res<()> {
+/// This modules error type.
+#[derive(Debug, Snafu)]
+#[snafu(visibility(pub))] // Sets the default visibility for these context selectors
+pub enum TransactionError {
+    AlreadyExists,
+    NotFound,
+
+    #[snafu(transparent)]
+    Other {
+        source: result::Error,
+    },
+}
+
+/// Insert a new user into the database.
+pub fn insert_new_user(conn: &mut PgConnection, user_id: &str) -> Result<(), TransactionError> {
     use super::schema::users::dsl::*;
 
     // Convert into internal DB type.
@@ -40,7 +53,7 @@ pub fn insert_asymmetric_key_pair(
     user_id: &str,
     key_id: &Uuid,
     key_pair: &AsymmetricKeyPairView,
-) -> Res<()> {
+) -> Result<(), TransactionError> {
     match users_dsl::users.find(user_id).execute(conn) {
         Ok(0) => insert_new_user(conn, user_id)?,
         Ok(_) => {
@@ -49,22 +62,19 @@ pub fn insert_asymmetric_key_pair(
         Err(e) => {
             return Err(e).context(result::DBErrorCtx {
                 message: "Operation 'insert user' failed.",
-            });
+            })?;
         }
     }
 
     match keys_dsl::keys.find(key_id).execute(conn) {
         Ok(0) => (),
         Ok(_) => {
-            return Err(result::Error::GenericError {
-                message: format!("Key '{}' already exists.", key_id),
-                source: None,
-            });
+            return Err(TransactionError::AlreadyExists);
         }
         Err(e) => {
             return Err(e).context(result::DBErrorCtx {
                 message: "Operation 'find key' failed.",
-            });
+            })?;
         }
     }
 
@@ -89,11 +99,11 @@ pub fn insert_asymmetric_key_pair(
 }
 
 pub fn get_asymmetric_key_pair(
-    log: &Logger,
+    _log: &Logger,
     conn: &mut PgConnection,
     user_id: &str,
     key_id: &Uuid,
-) -> Res<AsymmetricKeyPair> {
+) -> Result<AsymmetricKeyPair, TransactionError> {
     let res = DbAsymmetricKeyPair::belonging_to(&DbUser {
         id: user_id.to_owned(),
     })
@@ -104,15 +114,12 @@ pub fn get_asymmetric_key_pair(
     let key = match res {
         Ok(key) => key,
         Err(NotFound) => {
-            return Err(result::Error::GenericError {
-                message: format!("Key '{}' does not exist.", key_id),
-                source: None,
-            });
+            return Err(TransactionError::NotFound);
         }
         Err(e) => {
             return Err(e).context(result::DBErrorCtx {
                 message: "Operation 'find key' failed.",
-            });
+            })?;
         }
     };
 

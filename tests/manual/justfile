@@ -6,9 +6,10 @@ root_dir := justfile_directory()
 
 api-store-key:
     cd "{{root_dir}}" && \
-        http PUT http://localhost:8080/api/v1/demo/keys/$(uuidgen) \
-            public_key=asdf \
-            private_key_encrypted=asdf
-
+        uuid=$(uuidgen) && \
+        http PUT http://localhost:8080/api/v1/demo/keys/$uuid \
+            public_key=$uuid \
+            private_key_encrypted=$uuid && \
+        http GET http://localhost:8080/api/v1/demo/keys/$uuid
 
 run: api-store-key
