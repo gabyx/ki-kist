@@ -3,7 +3,7 @@ ARG IMAGE_TYPE="service"
 ARG TARGET="$COMPONENT-$IMAGE_TYPE"
 
 ARG ROOT_DIR="/build"
-ARG BUILD_TYPE="release"
+ARG BUILD_TYPE
 ARG ENABLE_BACKTRACE="0"
 
 ## Base Stage ##############################################################

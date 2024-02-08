@@ -6,9 +6,9 @@ root_dir := justfile_directory()
 
 api-store-key:
     cd "{{root_dir}}" && \
-        http --form --multipart PUT \
-        http://localhost:8080/api/job \
-        metadata@'job-meta.json;type=application/json' \
-        file@'job.md;type=text/markdown'
+        http PUT http://localhost:8080/api/v1/demo/keys/$(uuidgen) \
+            public_key=asdf \
+            private_key_encrypted=asdf
 
-run: api-job
+
+run: api-store-key

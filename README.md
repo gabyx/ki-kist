@@ -17,8 +17,8 @@
 
 The project `ki-kist` (_/kiː ˈkɪst/_[^1]) is an unfinished proof-of-concept and
 learning material to conceptualize a secure storage client/server architecture
-to store asymmetric encryption key pairs (public and private keys) which the
-following task:
+to store asymmetric encryption key pairs (public and private keys) written in
+Rust with the following task in mind.
 
 Provide the architecture and logic for a server and a client with the following
 features:
@@ -35,8 +35,12 @@ features:
   - Verifies a signature for a specific username/email.
 
 - A **server** that:
+
   - Stores & retrieves public keys.
   - Stores & retrieves private encrypted keys.
+
+- Written in Rust. Why?
+  [**Make sure to have read the note on the conclusion here.**](/docs/architecture.md#conclusion)
 
 **Note: This is a proof-of-concept and a learning project. It should not be used
 in production.**

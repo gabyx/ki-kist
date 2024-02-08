@@ -4,24 +4,81 @@ use std::ops::DerefMut;
 
 use common::{
     db,
-    log::info,
+    keys::AsymmetricKeyPairView,
+    log::{debug, info},
     response,
     response::{json, Status},
     result::ResultExt,
     rocket::WrappedUuid,
 };
-use rocket::{form::Form, routes, Build, Rocket, Shutdown, State};
+
+use rocket::{form::Form, routes, serde::json::Json, Build, Rocket, Shutdown, State};
 use snafu::prelude::*;
 
-use crate::{persist, state::AppState};
+use crate::{
+    messages::{GetKeyResponse, StoreKeyResponse},
+    persist,
+    state::AppState,
+};
 
-#[rocket::put("/api/user/<user_id>/store/<key_id>")]
+/// The request handler to store a key.
+/// TODO: Should have a request guard `key: ApiKey` which guards against
+/// non-authentication.
+#[rocket::put("/api/v1/<user_id>/keys/<key_id>", data = "<key_pair>")]
 async fn store_key(
     s: &State<AppState>,
-    user_id: WrappedUuid,
+    user_id: &str,
     key_id: WrappedUuid,
-) -> json::JsonResponse<String> {
-    json::success!("Works".to_owned())
+    key_pair: Json<AsymmetricKeyPairView<'_>>,
+) -> json::JsonResponse<StoreKeyResponse> {
+    debug!(
+        s.log,
+        "Storing key for user '{}' and key id '{}'",
+        user_id,
+        key_id.unwrap()
+    );
+
+    {
+        debug!(s.log, "Insert into database.");
+        let mut d = s.db.lock().await;
+        db::transactions::insert_asymmetric_key_pair(
+            &s.log,
+            d.deref_mut(),
+            user_id,
+            key_id.unwrap(),
+            &key_pair,
+        )?;
+        // .log(&s.log)?
+    }
+
+    return json::success!(StoreKeyResponse {
+        message: format!("Succesfully stored the key pair.")
+    });
+}
+
+/// The request handler to retrieve a key.
+/// TODO: Should have a request guard `key: ApiKey` which guards against
+/// non-authentication.
+#[rocket::get("/api/v1/<user_id>/keys/<key_id>")]
+async fn get_key(
+    s: &State<AppState>,
+    user_id: &str,
+    key_id: WrappedUuid,
+) -> json::JsonResponse<GetKeyResponse> {
+    debug!(
+        s.log,
+        "Getting key pair for user '{}' and key id '{}'",
+        user_id,
+        key_id.unwrap()
+    );
+
+    let key = {
+        let mut d = s.db.lock().await;
+        db::transactions::get_asymmetric_key_pair(&s.log, d.deref_mut(), user_id, key_id.unwrap())
+            .log(&s.log)?
+    };
+
+    return json::success!(GetKeyResponse(key));
 }
 
 #[rocket::get("/api/shutdown")]
@@ -31,7 +88,7 @@ fn shutdown(shutdown: Shutdown) {
 
 /// Install all handlers for this application.
 pub fn install_handlers(r: Rocket<Build>) -> Rocket<Build> {
-    let r = r.mount("/", routes![store_key]);
+    let r = r.mount("/", routes![get_key, store_key]);
     return install_debug_handlers(r);
 }
 

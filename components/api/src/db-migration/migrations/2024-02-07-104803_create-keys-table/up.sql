@@ -5,7 +5,7 @@ CREATE TABLE keys (
     id uuid PRIMARY KEY,
     --
     -- The user_id this key belongs to.
-    user_id uuid NOT NULL,
+    user_id varchar NOT NULL,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (
         id
     ) ON DELETE CASCADE,

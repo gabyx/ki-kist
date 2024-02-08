@@ -6,8 +6,8 @@ use uuid::Uuid;
 pub struct WrappedUuid(Uuid);
 
 impl WrappedUuid {
-    pub fn unwrap(&self) -> Uuid {
-        return self.0;
+    pub fn unwrap(&self) -> &Uuid {
+        return &self.0;
     }
 }
 

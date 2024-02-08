@@ -77,6 +77,8 @@
           kustomize
           dbeaver
           sqlfluff # Linter
+          minisign
+          signify
 
           python311Packages.isort
           python311Packages.black

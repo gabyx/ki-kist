@@ -1,5 +1,4 @@
 // Include all modules.
-mod database;
 mod handlers;
 mod messages;
 mod persist;
@@ -9,6 +8,7 @@ use std::sync::Arc;
 
 use common::{
     config::get_env_var,
+    db,
     log::{create_logger, info, Logger},
 };
 
@@ -25,7 +25,7 @@ async fn create_rocket(
     log: Arc<Logger>,
     database_url: &str,
 ) -> Result<Rocket<Ignite>, rocket::Error> {
-    let db_conn = database::connect(&log, &database_url);
+    let db_conn = db::connect(&log, &database_url);
     let app_state = AppState::new(log.clone(), db_conn);
 
     info!(log, "Start rocket.");

@@ -1,4 +1,4 @@
-use common::{
+use crate::{
     log::{info, Logger},
     log_panic,
 };
