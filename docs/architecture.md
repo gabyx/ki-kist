@@ -282,8 +282,8 @@ encryption ([`age`](https://github.com/str4d/rage)) has the following problems
 ### Conclusion
 
 Use [`signify-rs`](https://github.com/badboy/signify-rs) for asymmetric key
-generation used for **signing** and at the moment not needed: generate `age`
-keys for **encryption**.
+generation used for **signing**, `age` is not needed at the moment since
+`signify-rs` generates already encrypted private keys with a passphrase.
 
 ### References
 

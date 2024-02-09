@@ -45,7 +45,7 @@ async fn create_rocket(
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
-    let log = create_logger();
+    let log = create_logger(true);
     info!(log, "Configuring 'API' service.");
 
     info!(log, "Load environment variables.");

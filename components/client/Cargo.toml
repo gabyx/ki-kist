@@ -1,7 +1,10 @@
 [package]
-name = "converter"
+name = "client"
 version = "0.1.0"
 edition = "2021"
+
+[build]
+rustflags = ["-Z unstable-options"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [[bin]]
@@ -16,6 +19,21 @@ dotenv = "0.15.0"
 tokio = "1.35.0"
 async-std = "1.12.0"
 async-trait = "0.1.75"
+rpassword = "7.3.1"
+rand_core = "0.6.4"
+
+[dependencies.passwords]
+version = "3.1.16"
+features = ["common-password"]
+
+[dependencies.libsignify]
+version = "0.6.0"
+features = ['std']
+
+
+[dependencies.snafu]
+version = "0.8.0"
+features = ['std', 'backtrace']
 
 [dependencies.clap]
 version = "4.5.0"

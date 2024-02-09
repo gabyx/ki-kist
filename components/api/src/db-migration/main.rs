@@ -22,7 +22,7 @@ fn run_migrations<DB: Backend>(
 }
 
 fn main() {
-    let log = create_logger();
+    let log = create_logger(true);
     info!(log, "Configuring 'API' service.");
 
     info!(log, "Load environment variables.");

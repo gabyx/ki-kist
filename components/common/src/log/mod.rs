@@ -1,18 +1,26 @@
 use slog::{self, o, Drain};
 use slog_async;
-use std::sync::Arc;
+use std::{io, sync::Arc};
 
 /// Wrapping our internal type to the outside.
 /// TODO: Wrap it better, is a struct with private member possible?
 pub type Logger = slog::Logger;
 
-pub fn create_logger() -> Arc<Logger> {
+#[allow(dead_code)]
+fn no_out(_io: &mut dyn io::Write) -> io::Result<()> {
+    return Ok(());
+}
+
+pub fn create_logger(timestamp: bool) -> Arc<Logger> {
     let decorator = slog_term::TermDecorator::new().build();
 
-    let drain = slog_term::FullFormat::new(decorator)
-        //.use_custom_timestamp(no_out)
-        .build()
-        .fuse();
+    let mut d1 = slog_term::FullFormat::new(decorator);
+
+    if !timestamp {
+        d1 = d1.use_custom_timestamp(no_out);
+    }
+
+    let drain = d1.build().fuse();
 
     let drain = slog_async::Async::new(drain)
         .chan_size(5_000_000)
