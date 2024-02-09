@@ -17,7 +17,6 @@ use snafu::prelude::*;
 
 use crate::{
     messages::{GetKeyResponse, StoreKeyResponse},
-    persist,
     state::AppState,
 };
 

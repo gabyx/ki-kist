@@ -28,10 +28,12 @@ strictest security measures possible. The following interactions happen:
 
      - it handles exit codes properly (an absolutely horrifiying example would
        be JFrogs Artifactory CLI `jf`).
-     - it tries to either prompt the user to enter the encryption token for the
+     - it tries to either prompt the user to enter the passphrase for the
        private key generation or it reads it from a file (argument
-       `--encryption-token <file>`) to avoid leaking anything to the process
+       `--passphrase-file <file>`) to avoid leaking anything to the process
        listing (e.g. `ps`).
+     - Passphrases need to be
+       [strong (see `validate_passphrase`)](../components/client/src/generate.rs#L).
 
    - It generates asymmetric keys as
      [described here](#asymmetric-key-generation).
@@ -77,6 +79,8 @@ merits and drawbacks.
 | Easier to work with but custom API (No SQL).                                                        | SQL is terse but standardized and shitty to work with.                                          |
 | Retrieval of documents follows [ACID](https://www.mongodb.com/basics/acid-transactions) properties. | Simple table updates follow [ACID](https://www.mongodb.com/basics/acid-transactions) properties |
 | Optimistic concurrency control with document version number needed when updating.                   | Row updates follow [ACID](https://www.mongodb.com/basics/acid-transactions) properties.         |
+
+_TODO: Add references._
 
 In the following I quickly outline what the two scenarios would look like for
 MongoDB and PostgreSQL and why we chose PostgreSQL at the end.

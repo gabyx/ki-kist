@@ -1,7 +1,6 @@
 // Include all modules.
 mod handlers;
 mod messages;
-mod persist;
 mod state;
 
 use std::sync::Arc;

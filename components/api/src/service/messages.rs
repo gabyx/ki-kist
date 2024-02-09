@@ -1,4 +1,4 @@
-use common::keys::{AsymmetricKeyPair, AsymmetricKeyPairView};
+use common::keys::AsymmetricKeyPair;
 use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
