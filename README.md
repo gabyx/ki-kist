@@ -1,24 +1,34 @@
-# Ki-Kist
+<div style="text-align:center">
+<img src="docs/logo.svg" style="width: 250px;">
+</div>
+<h1>Ki-Kist</h1>
 
 <!--toc:start-->
 
-- [Ki-Kist](#ki-kist)
 - [Overview](#overview)
-  - [Requirements](#requirements)
   - [Project Structure](#project-structure)
   - [Architecture](#architecture)
+  - [Requirements](#requirements)
   - [Quick Instructions](#quick-instructions)
+    - [Deploy](#deploy)
+    - [Shutdown](#shutdown)
   - [Locally Building Components](#locally-building-components)
   - [Deploying Components to the Cluster (Kubernetes)](#deploying-components-to-the-cluster-kubernetes)
-  - [Development](#development) - [Debugging in Rust](#debugging-in-rust) -
-  [Database Inspection](#database-inspection) - [Githooks](#githooks) -
-  [CI/CD](#cicd) - [Gitlab](#gitlab) - [Testing API Calls](#testing-api-calls)
-  <!--toc:end-->
+  - [Development](#development)
+    - [Tests](#tests)
+    - [Debugging in Rust](#debugging-in-rust)
+    - [Database Inspection](#database-inspection)
+    - [Githooks](#githooks)
+    - [CI/CD](#cicd)
+      - [Gitlab](#gitlab)
+    - [Testing API Calls](#testing-api-calls)
+
+<!--toc:end-->
 
 The project `ki-kist` (_/kiː ˈkɪst/_[^1]) is an unfinished proof-of-concept and
 learning material to conceptualize a secure storage client/server architecture
-to store asymmetric encryption key pairs (public and private keys) written in
-Rust with the following task in mind.
+to store asymmetric encryption/signing key pairs (public and private keys)
+written in Rust with the following task in mind.
 
 Provide the architecture and logic for a server and a client with the following
 features:
