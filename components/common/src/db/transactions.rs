@@ -3,7 +3,7 @@ use super::{
     schema::{keys::dsl as keys_dsl, users::dsl as users_dsl},
 };
 use crate::{
-    keys::{AsymmetricKeyPair, AsymmetricKeyPairView},
+    keys::AsymmetricKeyPair,
     log::{info, Logger},
     result::{self},
 };
@@ -52,7 +52,7 @@ pub fn insert_asymmetric_key_pair(
     conn: &mut PgConnection,
     user_id: &str,
     key_id: &Uuid,
-    key_pair: &AsymmetricKeyPairView,
+    key_pair: &AsymmetricKeyPair,
 ) -> Result<(), TransactionError> {
     match users_dsl::users.find(user_id).execute(conn) {
         Ok(0) => insert_new_user(conn, user_id)?,

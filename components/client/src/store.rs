@@ -13,27 +13,18 @@ pub fn store_key_pair(
     user_id: &str,
     key: &AsymmetricKeyPair,
 ) -> Result<(), Error> {
+    // TODO: Maybe: Redirect stdout to stderr and output json on stdout.
+
     let client = reqwest::blocking::Client::new();
 
-    // let k = AsymmetricKeyPair {
-    //     public_key: "asdf".to_owned(),
-    //     private_key_encrypted: "asdf".to_owned(),
-    // };
     let req = client
         .put(format!("{}/api/v1/{}/keys", host_url, user_id))
         .json(&key)
         .build()?;
 
-    info!(
-        log,
-        "{}",
-        String::from_utf8_lossy(req.body().unwrap().as_bytes().unwrap())
-    );
-    info!(log, "Request: {:?}", req.body());
-
     let res = client.execute(req)?;
-
-    info!(log, "Request {:?}", res);
+    let key = res.json();
+    info!(log, "Succesfully stored on server with key id: '{}'", ));
 
     Ok(())
 }

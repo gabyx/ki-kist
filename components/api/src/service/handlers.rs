@@ -4,22 +4,22 @@ use std::ops::DerefMut;
 
 use common::{
     db,
-    keys::AsymmetricKeyPairView,
+    keys::AsymmetricKeyPair,
     log::{debug, info},
-    response,
-    response::{json, Status},
+    messages::StoreKeyRequest,
+    response::{self, json, Status},
     result::ResultExt,
     rocket::WrappedUuid,
 };
 
-use rocket::{form::Form, routes, serde::json::Json, Build, Rocket, Shutdown, State};
+use rocket::{
+    form::Form, routes, serde::json::Json, Build, Rocket, Shutdown, State,
+};
 use snafu::prelude::*;
 use uuid::Uuid;
 
-use crate::{
-    messages::{GetKeyResponse, StoreKeyResponse},
-    state::AppState,
-};
+use crate::state::AppState;
+use common::messages::{GetKeyResponse, StoreKeyResponse};
 
 /// The request handler to store a key.
 /// TODO: Should have a request guard `key: ApiKey` which guards against
@@ -28,7 +28,7 @@ use crate::{
 async fn store_key(
     s: &State<AppState>,
     user_id: &str,
-    key_pair: Json<AsymmetricKeyPairView<'_>>,
+    key_pair: Json<StoreKeyRequest>,
 ) -> json::JsonResponse<StoreKeyResponse> {
     let key_id = Uuid::new_v4();
 
@@ -43,6 +43,8 @@ async fn store_key(
         debug!(s.log, "Insert into database.");
         let mut d = s.db.lock().await;
 
+        let key: &StoreKeyRequest = &key_pair;
+
         // TODO: This call blocks the executor, but
         // it into a task or use diesel async libraries.
         db::transactions::insert_asymmetric_key_pair(
@@ -50,7 +52,7 @@ async fn store_key(
             d.deref_mut(),
             user_id,
             &key_id,
-            &key_pair,
+            &key.0,
         )
         .log(&s.log)
         .map_err(|e| response::Error::from(e))?
@@ -80,9 +82,14 @@ async fn get_key(
 
         // TODO: This call blocks the executor, but
         // it into a task or use diesel async libraries.
-        db::transactions::get_asymmetric_key_pair(&s.log, d.deref_mut(), user_id, key_id.unwrap())
-            .log(&s.log)
-            .map_err(|e| response::Error::from(e))?
+        db::transactions::get_asymmetric_key_pair(
+            &s.log,
+            d.deref_mut(),
+            user_id,
+            key_id.unwrap(),
+        )
+        .log(&s.log)
+        .map_err(|e| response::Error::from(e))?
     };
 
     return json::success!(GetKeyResponse(key));
