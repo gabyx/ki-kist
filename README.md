@@ -1,6 +1,7 @@
-<div style="text-align:center">
+<p align="center">
 <img src="docs/logo.svg" style="width: 250px;">
-</div>
+</p>
+
 <h1>Ki-Kist</h1>
 
 <!--toc:start-->
