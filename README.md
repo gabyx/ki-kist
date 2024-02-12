@@ -136,7 +136,8 @@ and either
 ## Quick Instructions
 
 The following walks you through starting up a local Kubernetes cluster with
-`kind`, inspecting the cluster and also shutting it down again.
+`kind`, inspecting the cluster, accessing the `api` service with the `client`
+and also shutting the cluster down again.
 
 **Note**: All commands given in the following are safe to use (virtualized or
 locally scoped to the repository) to use and **will only** minimally fiddle with
@@ -174,6 +175,54 @@ just deploy-up
 
 Open the `tilt` web browser [`http://localhost:10350`](http://localhost:10350)
 to see the log & status of all running components, notably `api` and `postgres`.
+
+### Access With Client
+
+Run the following
+
+```shell
+cd components/client
+just client -h
+```
+
+to inspect what you can do.
+
+#### Storing a Key Pair
+
+```shell
+cd components/client
+echo "f73o6k&ntb9ojR@XmVgjazt%nae" > passphrase.txt # Do this only for testing!!!
+just client store --passphrase-file passphrase.txt
+```
+
+#### Retrieving a Key Pair
+
+```shell
+cd components/client
+just client get --key-id "<key-id>"
+```
+
+#### Signing a Document
+
+```shell
+cd components/client
+just client sign \
+    --key-id "<key-id>" \
+    --file "Cargo.toml" \
+    --passphrase-file passphrase.txt
+```
+
+This produces a signature file `Cargo.toml.sig`.
+
+#### Verifying a Signed Document
+
+```shell
+cd components/client
+just client verify \
+    --key-id "<key-id>" \
+    --file "Cargo.toml" \
+    --file-signature "Cargo.toml.sig" \
+```
 
 ### Shutdown
 

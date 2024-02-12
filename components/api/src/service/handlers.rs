@@ -43,8 +43,6 @@ async fn store_key(
         debug!(s.log, "Insert into database.");
         let mut d = s.db.lock().await;
 
-        let key: &StoreKeyRequest = &key_pair;
-
         // TODO: This call blocks the executor, but
         // it into a task or use diesel async libraries.
         db::transactions::insert_asymmetric_key_pair(
@@ -52,7 +50,7 @@ async fn store_key(
             d.deref_mut(),
             user_id,
             &key_id,
-            &key.0,
+            &(&key_pair as &StoreKeyRequest).0,
         )
         .log(&s.log)
         .map_err(|e| response::Error::from(e))?

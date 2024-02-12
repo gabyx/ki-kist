@@ -14,8 +14,9 @@ Since the backend handles a very vulnerable part (maybe part of a larger
 application), namely storing asymmetric keys, it is crucial to employ the
 strictest security measures possible. The following interactions happen:
 
-1. The `client` communicates with the backend over `HTTP/2.0` requests which are
-   TLS encrypted (version >=`1.2`).
+1. The `client` communicates with the backend over `HTTP/2.0` requests to a REST
+   API (Using `gRPC` is overkill and couples too strongly). The connection
+   should be TLS encrypted (version >=`1.2`).
 
    - The client should only store the keys it interacts with in physical memory
      and only decrypt the private key when really needed. We treat the CLI

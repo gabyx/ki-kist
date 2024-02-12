@@ -1,11 +1,21 @@
 mod error;
 mod generate;
+mod get;
+mod password;
+mod sign;
 mod store;
+mod verify;
 
-use crate::{generate::generate_asymmetric_key_pair, store::store_key_pair};
-use clap::{Args, Parser, Subcommand};
+use crate::{
+    generate::generate_asymmetric_key_pair, get::get_key_pair,
+    store::store_key_pair,
+};
+use clap::{Args, Parser};
 use common::result::ResultExt;
+use sign::sign_file;
 use std::path::PathBuf;
+use uuid::Uuid;
+use verify::verify_file;
 
 #[derive(Parser)]
 #[command(name = "kikist-cli")]
@@ -31,7 +41,7 @@ struct HostArgs {
 #[derive(Args, Debug)]
 struct UserArgs {
     #[arg(short, long)]
-    user: String,
+    user_id: String,
 }
 
 #[derive(Args, Debug)]
@@ -39,6 +49,15 @@ struct PassphraseArgs {
     // If password file is not given, the user is prompted to enter one.
     #[arg(short, long)]
     passphrase_file: Option<PathBuf>,
+}
+
+#[derive(Args, Debug)]
+struct FileArgs {
+    #[arg(short, long)]
+    file: PathBuf,
+
+    #[arg(long)]
+    file_signature: Option<PathBuf>,
 }
 
 #[derive(Args, Debug)]
@@ -65,7 +84,10 @@ struct GetArgs {
     host: HostArgs,
 
     #[command(flatten)]
-    pass: PassphraseArgs,
+    user: UserArgs,
+
+    #[arg(short, long)]
+    key_id: Uuid,
 }
 
 #[derive(Args, Debug)]
@@ -73,11 +95,32 @@ struct SignArgs {
     #[command(flatten)]
     host: HostArgs,
 
+    #[command(flatten)]
+    user: UserArgs,
+
     #[arg(short, long)]
-    file: PathBuf,
+    key_id: Uuid,
 
     #[command(flatten)]
     pass: PassphraseArgs,
+
+    #[command(flatten)]
+    file: FileArgs,
+}
+
+#[derive(Args, Debug)]
+struct VerifyArgs {
+    #[command(flatten)]
+    host: HostArgs,
+
+    #[command(flatten)]
+    user: UserArgs,
+
+    #[arg(short, long)]
+    key_id: Uuid,
+
+    #[command(flatten)]
+    file: FileArgs,
 }
 
 #[derive(Parser, Debug)]
@@ -86,6 +129,7 @@ enum Subcommands {
     Store(StoreArgs),
     Get(GetArgs),
     Sign(SignArgs),
+    Verify(VerifyArgs),
 }
 
 fn main() -> Result<(), error::Error> {
@@ -94,24 +138,73 @@ fn main() -> Result<(), error::Error> {
     let cli = Cli::parse();
     match cli.command {
         Subcommands::Generate(args) => {
-            generate_asymmetric_key_pair(&log, cli.non_interactive, &args.pass.passphrase_file)
-                .log(&log)?;
+            generate_asymmetric_key_pair(
+                &log,
+                cli.non_interactive,
+                &args.pass.passphrase_file,
+            )
+            .log(&log)?;
         }
         Subcommands::Store(args) => {
-            let key =
-                generate_asymmetric_key_pair(&log, cli.non_interactive, &args.pass.passphrase_file)
-                    .log(&log)?;
+            let key = generate_asymmetric_key_pair(
+                &log,
+                cli.non_interactive,
+                &args.pass.passphrase_file,
+            )
+            .log(&log)?;
 
             store_key_pair(
                 &log,
                 &args.host.host,
                 &args.host.access_token,
-                &args.user.user,
+                &args.user.user_id,
                 &key,
-            );
+            )
+            .log(&log)?;
         }
-        Subcommands::Get(args) => (),
-        Subcommands::Sign(args) => (),
+        Subcommands::Get(args) => {
+            get_key_pair(
+                &log,
+                &args.host.host,
+                &args.host.access_token,
+                &args.user.user_id,
+                &args.key_id,
+            )
+            .log(&log)?;
+        }
+        Subcommands::Sign(args) => {
+            let key = get_key_pair(
+                &log,
+                &args.host.host,
+                &args.host.access_token,
+                &args.user.user_id,
+                &args.key_id,
+            )
+            .log(&log)?;
+
+            sign_file(
+                &log,
+                cli.non_interactive,
+                &key,
+                &args.pass.passphrase_file,
+                &args.file.file,
+                args.file.file_signature,
+            )
+            .log(&log)?
+        }
+        Subcommands::Verify(args) => {
+            let key = get_key_pair(
+                &log,
+                &args.host.host,
+                &args.host.access_token,
+                &args.user.user_id,
+                &args.key_id,
+            )
+            .log(&log)?;
+
+            verify_file(&log, &key, &args.file.file, args.file.file_signature)
+                .log(&log)?
+        }
     }
 
     Ok(())

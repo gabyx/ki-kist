@@ -1,4 +1,4 @@
-use snafu::{prelude::*, Backtrace};
+use snafu::prelude::*;
 
 #[derive(Debug, Snafu)]
 #[snafu(visibility(pub))] // Sets the default visibility for these context selectors
