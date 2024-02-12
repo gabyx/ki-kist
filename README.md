@@ -53,8 +53,6 @@ features:
 - Written in Rust. Why?
   [**Make sure to have read the note on the conclusion here.**](/docs/architecture.md#conclusion)
 
-1.
-
 **Note: This is a proof-of-concept and a learning project. It should not be used
 in production.**
 
