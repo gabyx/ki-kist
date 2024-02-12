@@ -5,17 +5,16 @@ The following endpoints with base URL `api/` are implemented in
 
 _TODO: This section could be auto generated._
 
-## `PUT` **`/api/v1/{user_id}/keys/{key_id}`**:
+## `PUT` **`/api/v1/{user_id}/keys`**:
 
 - **Description**: Stores the public and encrypted private keys under user id
-  `user_id`. The key id must not exist already.
+  `user_id` and returns the key id generated.
 
 - **Method**: `PUT`
 - **Parameters**:
 
   - `user_id`: The user id [`str`]. **Should probably be `uuid` later too for
     better security**.
-  - `key_id` : The key id [`uuid`].
 
 - **Request Body**: [`json`]
 
@@ -29,7 +28,13 @@ _TODO: This section could be auto generated._
 
 - Responses:
 
-  - Status `200` if the key pair was created.
+  - Status `200` if the key pair was created together with a response body
+    containing the key id `[uuid]`:
+
+    ```json
+    key_id: <uuid>
+    ```
+
   - Status `403` if the key id `key_id` already exists.
 
 ## `DELETE` **`/api/v1/{user_id}/keys/{key_id}`**:

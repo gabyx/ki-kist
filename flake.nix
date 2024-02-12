@@ -70,18 +70,24 @@
           cargo-watch
 
           just
-          dasel
+          jq
           parallel
           docker
           tilt
           kustomize
           dbeaver
           sqlfluff # Linter
-          minisign
+
+          # Cryptotools to test
           signify
 
+          # Tiltfiles format/lint.
           python311Packages.isort
           python311Packages.black
+
+          # OpenSSL for `reqwest`
+          pkg-config
+          openssl_3_2
         ];
 
         # Things needed only at compile-time.
@@ -91,7 +97,7 @@
         ];
 
         # Things needed at runtime.
-        buildInputs = with pkgs; [postgresql];
+        buildInputs = with pkgs; [postgresql openssl_3_2];
       in {
         default = pkgs.mkShell {
           inherit buildInputs;

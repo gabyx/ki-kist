@@ -9,6 +9,9 @@ pub enum Error {
     #[snafu(context(false))]
     IOError { source: std::io::Error },
 
+    #[snafu(context(false))]
+    RequestError { source: reqwest::Error },
+
     #[snafu(whatever, display("Error: {message}"))]
     GenericError {
         message: String,

@@ -4,12 +4,12 @@ set fallback := true
 set shell := ["bash", "-cue"]
 root_dir := justfile_directory()
 
-api-store-key:
+api-store-get-key:
+    echo "Storing and getting a public/private key."
     cd "{{root_dir}}" && \
-        uuid=$(uuidgen) && \
-        http PUT http://localhost:8080/api/v1/demo/keys/$uuid \
-            public_key=$uuid \
-            private_key_encrypted=$uuid && \
-        http GET http://localhost:8080/api/v1/demo/keys/$uuid
+        key_id=$(http -p HBhb PUT http://localhost:8080/api/v1/demo-user/keys \
+            public_key="untrusted comment: kikist generated public key (signify).\\nRWRaxY+Iep+IhJcW42smV2OlPkyfIr1fUBVhCDKFZufpoy04P8IJbzkP\\n" \
+            private_key_encrypted="untrusted comment: kikist generated private encrypted key (signify).\\nRWRCSwAAADK/t0p12Rbj/Jh2pBivdpdDRW00VLqZquBaxY+Iep+IhHl0EGWeFdIV/xA47rAOxZfYu3NrPY3VmDD+VDEPbSEplxbjayZXY6U+TJ8ivV9QFWEIMoVm5+mjLTg/wglvOQ8=\\n" | jq -re .key_id) && \
+        http -p HBhb GET http://localhost:8080/api/v1/demo-user/keys/$key_id
 
-run: api-store-key
+run: api-store-get-key

@@ -5,7 +5,6 @@ mod store;
 use crate::{generate::generate_asymmetric_key_pair, store::store_key_pair};
 use clap::{Args, Parser, Subcommand};
 use common::result::ResultExt;
-use slog::info;
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -13,7 +12,6 @@ use std::path::PathBuf;
 #[command(version = "0.0.1")]
 #[command(about ="The client for kikist - a public/private key store.", long_about = None)]
 struct Cli {
-    // TODO: not yet implemented.
     #[arg(short, long, default_value_t = false)]
     non_interactive: bool,
 
@@ -31,10 +29,16 @@ struct HostArgs {
 }
 
 #[derive(Args, Debug)]
+struct UserArgs {
+    #[arg(short, long)]
+    user: String,
+}
+
+#[derive(Args, Debug)]
 struct PassphraseArgs {
     // If password file is not given, the user is prompted to enter one.
     #[arg(short, long)]
-    passphrase: Option<PathBuf>,
+    passphrase_file: Option<PathBuf>,
 }
 
 #[derive(Args, Debug)]
@@ -47,6 +51,9 @@ struct GenerateArgs {
 struct StoreArgs {
     #[command(flatten)]
     host: HostArgs,
+
+    #[command(flatten)]
+    user: UserArgs,
 
     #[command(flatten)]
     pass: PassphraseArgs,
@@ -87,15 +94,21 @@ fn main() -> Result<(), error::Error> {
     let cli = Cli::parse();
     match cli.command {
         Subcommands::Generate(args) => {
-            generate_asymmetric_key_pair(&log, cli.non_interactive, &args.pass.passphrase)
+            generate_asymmetric_key_pair(&log, cli.non_interactive, &args.pass.passphrase_file)
                 .log(&log)?;
         }
         Subcommands::Store(args) => {
             let key =
-                generate_asymmetric_key_pair(&log, cli.non_interactive, &args.pass.passphrase)
+                generate_asymmetric_key_pair(&log, cli.non_interactive, &args.pass.passphrase_file)
                     .log(&log)?;
 
-            store_key_pair(&log, &key, args.host.host, args.host.access_token);
+            store_key_pair(
+                &log,
+                &args.host.host,
+                &args.host.access_token,
+                &args.user.user,
+                &key,
+            );
         }
         Subcommands::Get(args) => (),
         Subcommands::Sign(args) => (),

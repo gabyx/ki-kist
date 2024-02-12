@@ -21,6 +21,7 @@ async-std = "1.12.0"
 async-trait = "0.1.75"
 rpassword = "7.3.1"
 rand_core = "0.6.4"
+reqwest = { version = "0.11", features = ["json", "blocking"] }
 
 [dependencies.passwords]
 version = "3.1.16"
