@@ -113,8 +113,8 @@ On other systems you need the following essentials:
 
 and either
 
-- using the [`.devcontainer`](.devcontainer) setup with VS Code or over the CLI
-  with `just start-devcontainer` or
+- [todo]: Using the [`.devcontainer`](.devcontainer) setup with VS Code or over
+  the CLI with `just start-devcontainer` or
 - you develop locally and have the following tools installed and on your `PATH`:
 
   - [`cargo`](https://www.rust-lang.org/tools/install): Rust toolchain with

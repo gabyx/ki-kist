@@ -43,7 +43,7 @@ async fn store_key(
         debug!(s.log, "Insert into database.");
         let mut d = s.db.lock().await;
 
-        // TODO: This call blocks the executor, but
+        // TODO: This call blocks the executor, put
         // it into a task or use diesel async libraries.
         db::transactions::insert_asymmetric_key_pair(
             &s.log,
@@ -78,7 +78,7 @@ async fn get_key(
     let key = {
         let mut d = s.db.lock().await;
 
-        // TODO: This call blocks the executor, but
+        // TODO: This call blocks the executor, put
         // it into a task or use diesel async libraries.
         db::transactions::get_asymmetric_key_pair(
             &s.log,
