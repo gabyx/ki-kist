@@ -51,7 +51,7 @@ features:
   - Stores & retrieves private encrypted keys.
 
 - Written in Rust. Why?
-  [**Make sure to have read the note on the conclusion here.**](/docs/architecture.md#conclusion-1)
+  [**Make sure to have read the note on the conclusion here.**](/docs/architecture.md#conclusion)
 
 1.
 
