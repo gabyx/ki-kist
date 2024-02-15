@@ -94,6 +94,7 @@
         nativeBuildInputsDev = with pkgs; [
           k3s
           httpie
+          vale
         ];
 
         # Things needed at runtime.

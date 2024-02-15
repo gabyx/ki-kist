@@ -6,23 +6,20 @@ default_regex := ".*"
 
 # Administrative stuff.
 ###############################################################################
-create-cluster:
-    @cd "{{root_dir}}" && ./tools/create-kind-cluster.sh kikist
+create-cluster *args:
+    @cd "{{root_dir}}" && ./tools/create-kind-cluster.sh kikist {{args}}
 
-delete-cluster:
-    @cd "{{root_dir}}" && ./tools/delete-kind-cluster.sh kikist
+delete-cluster *args:
+    @cd "{{root_dir}}" && ./tools/delete-kind-cluster.sh kikist {{args}}
 
-start-gitlab-runner token="":
-    @cd "{{root_dir}}" && ./tools/start-gitlab-runner.sh "{{token}}"
+start-gitlab-runner token *args:
+    @cd "{{root_dir}}" && ./tools/start-gitlab-runner.sh {{args}} "{{token}}"
 
 start-db-tool:
     @cd "{{root_dir}}" && dbeaver
 
 # Development stuff.
 ###############################################################################
-start-devcontainer:
-    devcontainer
-
 start-nix-develop:
     cd {{root_dir}} && nix develop --command zsh
 
@@ -62,7 +59,10 @@ watch:
 # Component functionality.
 ###############################################################################
 component component task *args:
-    @"{{root_dir}}/tools/run-component-task.sh" "{{component}}" "{{task}}" "${@:3}"
+    @echo "Component '{{component}}': task: {{task}}" && \
+    echo -e "| =========================================" && \
+    "{{root_dir}}/tools/run-component-task.sh" "{{component}}" "{{task}}" "${@:3}" 2>&1 && \
+    echo -e "| =========================================\n\n"
 
 list-components regex=".*":
     @cd "{{root_dir}}" && find ./components -mindepth 1 -maxdepth 1 \
@@ -77,4 +77,21 @@ test what="manual":
 # Formatting.
 ###############################################################################
 format regex=".*":
+    cd "{{root_dir}}" && \
        tools/format.sh "{{parallel}}" "{{regex}}"
+
+# Linting.
+###############################################################################
+lint regex=".*":
+    cd "{{root_dir}}" && \
+        tools/lint.sh "{{parallel}}" "{{regex}}"
+
+lint-docs regex=".*":
+    cd "{{root_dir}}/docs" && \
+        just lint
+
+# CI Stuff
+###############################################################################
+upload-ci-images:
+    cd "{{root_dir}}" && \
+        .gitlab/scripts/upload-images.sh

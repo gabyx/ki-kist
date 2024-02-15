@@ -4,16 +4,16 @@ use snafu::prelude::*;
 #[snafu(visibility(pub))] // Sets the default visibility for these context selectors
 pub enum Error {
     #[snafu(context(false))]
-    CryptoError { source: libsignify::Error },
+    Crypto { source: libsignify::Error },
 
     #[snafu(context(false))]
-    IOError { source: std::io::Error },
+    IO { source: std::io::Error },
 
     #[snafu(context(false))]
-    RequestError { source: reqwest::Error },
+    Request { source: reqwest::Error },
 
     #[snafu(whatever, display("Error: {message}"))]
-    GenericError {
+    Generic {
         message: String,
         // Having a `source` is optional, but if it is present, it must
         // have this specific attribute and type:

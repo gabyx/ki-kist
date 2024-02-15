@@ -1,6 +1,5 @@
 use super::error::Error;
 use common::{keys::AsymmetricKeyPair, log::Logger, messages::GetKeyResponse};
-use reqwest;
 use uuid::Uuid;
 
 /// Store key on the server.

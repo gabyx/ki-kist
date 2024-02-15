@@ -1,38 +1,102 @@
 stages:
-  - check
+  - lint
+  - format
+  - build
+  - package
 
 .defaults-rules: &defaults-rules
-  - if: "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature|bugfix/ || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+  - if: "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^feature|bugfix/ ||
+      $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
     when: always
 
+.main-rules: &main-rules
+  - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    when: always
+
+upload-ci-images:
+  stage: package
+  needs: []
+  image: gabyxgabyx/kikist:ci-docker-1.0.0
+  rules:
+    - *main-rules
+  services:
+    - name: gabyxgabyx/kikist:ci-docker-dind-1.0.0
+      alias: docker
+  script:
+    - apk add git bash just findutils parallel
+    - just upload-ci-images
+
 format:
-  stage: check
-  image: docker:24
+  stage: format
+  needs: []
+  image: gabyxgabyx/kikist:ci-format-1.0.0
   rules:
     - *defaults-rules
   services:
-    - docker:24-dind
+    - name: gabyxgabyx/kikist:ci-docker-dind-1.0.0
+      alias: docker
+  variables:
+    # When you use the dind service, you must instruct Docker to talk with
+    # the daemon started inside of the service 'docker:*-dind'.
+    # The daemon is available with a network connection instead of the default
+    # /var/run/docker.sock socket.
+    # Docker does this automatically by setting the DOCKER_HOST in
+    # https://github.com/docker-library/docker/blob/master/docker-entrypoint.sh#L30
+    # The 'docker' hostname is the alias of the service container as described
+    # at https://docs.gitlab.com/ee/ci/services/#accessing-the-services.
+    # which is `docker` and then DOCKER_HOST=tcp://docker:2376
+    #
+    # We need to install Githooks into the build directory which allows
+    # Githooks to mount it to its docker runs, apparently.
+    GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
+  script:
+    - just format
+
+lint:
+  stage: lint
+  needs: []
+  image: gabyxgabyx/kikist:ci-lint-1.0.0
+  services:
+    - name: gabyxgabyx/kikist:ci-docker-dind-1.0.0
+      alias: docker
+  rules:
+    - *defaults-rules
   variables:
     GITHOOKS_INSTALL_PREFIX: "$CI_BUILDS_DIR/githooks"
   script:
-    - apk add git jq curl bash just findutils parallel
-    - just format
+    - nix develop .#ci --command just --set parallel true lint
 
-build:
-  stage: check
-  image: nixpkgs/nix-flakes:nixos-22.11
+lint-docs:
+  stage: lint
+  needs: []
+  image: gabyxgabyx/kikist:ci-lint-docs-1.0.0
+  services:
+    - name: gabyxgabyx/kikist:ci-docker-dind-1.0.0
+      alias: docker
   rules:
     - *defaults-rules
   script:
-    - git config --global safe.directories "*"
-    - nix develop . --command just --set parallel true build
-# build-image:
-#   stage: check
-#   image: docker:24
-#   rules:
-#     - *defaults-rules
-#   services:
-#     - docker:24-dind
-#   script:
-#     - apk add git bash just findutils parallel
-#     - just --set parallel true build-image
+    - just --set parallel true lint-docs
+  allow_failure: true
+
+build:
+  stage: build
+  needs: []
+  image: gabyxgabyx/kikist:ci-build-1.0.0
+  rules:
+    - *defaults-rules
+  script:
+    - nix develop .#ci --command just --set parallel true build
+
+build-image:
+  stage: package
+  needs: []
+  image: gabyxgabyx/kikist:ci-docker-1.0.0
+  rules:
+    - *defaults-rules
+  services:
+    - name: gabyxgabyx/kikist:ci-docker-dind-1.0.0
+      alias: docker
+  script:
+    - apk add git bash just findutils parallel
+    - just --set parallel true build-image
