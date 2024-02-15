@@ -8,8 +8,8 @@ use crate::{
     result::{self},
 };
 use diesel::{
-    self, result::Error::NotFound, BelongingToDsl, ExpressionMethods, PgConnection, QueryDsl,
-    RunQueryDsl, SelectableHelper,
+    self, result::Error::NotFound, BelongingToDsl, ExpressionMethods,
+    PgConnection, QueryDsl, RunQueryDsl, SelectableHelper,
 };
 use snafu::prelude::*;
 use uuid::Uuid;
@@ -28,7 +28,10 @@ pub enum TransactionError {
 }
 
 /// Insert a new user into the database.
-pub fn insert_new_user(conn: &mut PgConnection, user_id: &str) -> Result<(), TransactionError> {
+pub fn insert_new_user(
+    conn: &mut PgConnection,
+    user_id: &str,
+) -> Result<(), TransactionError> {
     use super::schema::users::dsl::*;
 
     // Convert into internal DB type.
@@ -60,7 +63,7 @@ pub fn insert_asymmetric_key_pair(
             info!(log, "User already exists: '{}'", user_id);
         }
         Err(e) => {
-            return Err(e).context(result::DBErrorCtx {
+            Err(e).context(result::DBErrorCtx {
                 message: "Operation 'insert user' failed.",
             })?;
         }
@@ -72,7 +75,7 @@ pub fn insert_asymmetric_key_pair(
             return Err(TransactionError::AlreadyExists);
         }
         Err(e) => {
-            return Err(e).context(result::DBErrorCtx {
+            Err(e).context(result::DBErrorCtx {
                 message: "Operation 'find key' failed.",
             })?;
         }

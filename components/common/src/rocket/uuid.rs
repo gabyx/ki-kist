@@ -15,6 +15,6 @@ impl<'a> FromParam<'a> for WrappedUuid {
     type Error = uuid::Error;
 
     fn from_param(param: &'a str) -> Result<Self, Self::Error> {
-        return Uuid::try_parse(param).map(|res| WrappedUuid(res));
+        return Uuid::try_parse(param).map(WrappedUuid);
     }
 }

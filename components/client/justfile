@@ -9,7 +9,7 @@ build *args:
     cd "{{comp_dir}}" && cargo build "${@:1}"
 
 build-image *args:
-    docker build --progress plain "${@:1}" -t "kikist-converter-service:test" -f docker/Dockerfile "{{root_dir}}"
+    docker build --progress plain "${@:1}" -t "kikist-client-cli:test" -f docker/cli/Dockerfile "{{root_dir}}"
 
 watch:
     cd "{{comp_dir}}" && cargo watch -x 'build'
@@ -18,6 +18,10 @@ format:
     cd "{{comp_dir}}" && \
     	docker run -v "{{root_dir}}:/repo" -v "$(pwd):/workspace" -w "/workspace" \
     	instrumentisto/rust:nightly-alpine cargo fmt -- --config-path /repo
+
+lint *args:
+    cd "{{comp_dir}}" && \
+        {{root_dir}}/tools/run-rust-lint.sh {{args}}
 
 client *args:
     @cd "{{comp_dir}}" && \

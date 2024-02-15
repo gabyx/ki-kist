@@ -23,7 +23,7 @@ async fn create_rocket(
     log: Arc<Logger>,
     database_url: &str,
 ) -> Result<Rocket<Ignite>, rocket::Error> {
-    let db_conn = db::connect(&log, &database_url);
+    let db_conn = db::connect(&log, database_url);
     let app_state = AppState::new(log.clone(), db_conn);
 
     info!(log, "Start rocket.");

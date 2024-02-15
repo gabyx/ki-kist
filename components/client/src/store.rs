@@ -4,7 +4,6 @@ use common::{
     log::{info, Logger},
     messages::StoreKeyResponse,
 };
-use reqwest;
 
 /// Store key on the server.
 pub fn store_key_pair(

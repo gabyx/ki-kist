@@ -4,6 +4,4 @@
 !*.tmpl
 target
 
-passphrase*
-password*
 *.sig

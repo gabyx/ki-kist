@@ -17,19 +17,6 @@ function clean_up() {
     fi
 }
 
-function ci_setup_githooks() {
-    mkdir -p "$GITHOOKS_INSTALL_PREFIX"
-
-    printInfo "Install Githooks."
-    curl -sL "https://raw.githubusercontent.com/gabyx/githooks/main/scripts/install.sh" |
-        bash -s -- -- --use-manual --non-interactive --prefix "$GITHOOKS_INSTALL_PREFIX"
-
-    git hooks config enable-containerized-hooks --global --set
-
-    printInfo "Pull all shared Githooks repositories."
-    git hooks shared update
-}
-
 function ci_assert_no_diffs() {
     if ! git diff --quiet; then
         die "Commit produced diffs, probably because of format:" \
@@ -39,7 +26,7 @@ function ci_assert_no_diffs() {
 }
 
 function run_format_shared_hooks() {
-    printInfo "Run all formats scripts in shared hook repositories."
+    print_info "Run all formats scripts in shared hook repositories."
     git hooks exec --containerized \
         ns:githooks-shell/scripts/format-shell-all.yaml -- --force --dir "."
 
@@ -61,7 +48,7 @@ parallel="$1"
 regex="$2"
 
 if [ "${CI:-}" = "true" ]; then
-    ci_setup_githooks
+    ci_setup_githooks "$GITHOOKS_INSTALL_PREFIX"
     ci_assert_no_diffs
 fi
 

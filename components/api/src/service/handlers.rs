@@ -1,22 +1,19 @@
+#![allow(clippy::let_unit_value)]
 #![allow(unused_imports)] // Rocket generates pub functions which cause these warnings.
 
 use std::ops::DerefMut;
 
 use common::{
     db,
-    keys::AsymmetricKeyPair,
-    log::{debug, info},
+    log::debug,
     messages::StoreKeyRequest,
-    response::{self, json, Status},
+    response::{self, json},
     result::ResultExt,
     rocket::WrappedUuid,
 };
-
-use rocket::{
-    form::Form, routes, serde::json::Json, Build, Rocket, Shutdown, State,
-};
-use snafu::prelude::*;
 use uuid::Uuid;
+
+use rocket::{routes, serde::json::Json, Build, Rocket, Shutdown, State};
 
 use crate::state::AppState;
 use common::messages::{GetKeyResponse, StoreKeyResponse};
@@ -53,7 +50,7 @@ async fn store_key(
             &(&key_pair as &StoreKeyRequest).0,
         )
         .log(&s.log)
-        .map_err(|e| response::Error::from(e))?
+        .map_err(response::Error::from)?
     }
 
     return json::success!(StoreKeyResponse { key_id });
@@ -87,7 +84,7 @@ async fn get_key(
             key_id.unwrap(),
         )
         .log(&s.log)
-        .map_err(|e| response::Error::from(e))?
+        .map_err(response::Error::from)?
     };
 
     return json::success!(GetKeyResponse(key));

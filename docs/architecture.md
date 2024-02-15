@@ -7,7 +7,7 @@ are marked with: ⚒ .
 ## Component Diagram
 
 <div style="text-align:center">
-    <img src="deployment.drawio.svg" alt="Architecture"/>
+    <img src="assets/deployment.drawio.svg" alt="Architecture"/>
 </div>
 
 Since the backend handles a very vulnerable part (maybe part of a larger

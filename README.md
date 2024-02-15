@@ -1,8 +1,10 @@
 <p align="center">
-<img src="docs/logo.svg" style="width: 250px;">
+<img src="docs/assets/logo.svg" style="width: 250px;">
 </p>
 
 <h1>Ki-Kist</h1>
+
+[![pipeline status](https://gitlab.com/gabyx/ki-kist/badges/main/pipeline.svg)](https://gitlab.com/gabyx/ki-kist/-/commits/main)
 
 <!--toc:start-->
 

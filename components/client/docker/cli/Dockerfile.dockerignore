@@ -6,9 +6,9 @@
 !Cargo.toml
 !Cargo.lock
 
-!components/converter/**/Cargo.toml
-!components/converter/**/Cargo.lock
-!components/converter/**/*.rs
+!components/client/**/Cargo.toml
+!components/client/**/Cargo.lock
+!components/client/**/*.rs
 
 !components/common/**/Cargo.toml
 !components/common/**/Cargo.lock
