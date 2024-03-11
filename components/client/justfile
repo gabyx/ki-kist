@@ -23,9 +23,6 @@ lint *args:
     cd "{{comp_dir}}" && \
         {{root_dir}}/tools/run-rust-lint.sh {{args}}
 
-client *args:
-    @cd "{{comp_dir}}" && \
-        cargo run {{args}} \
-        --host "http://localhost:8080" \
-        --access-token todo \
-        --user-id demo
+run *args:
+    echo "Running client:"
+    cargo run --quiet -- {{args}}

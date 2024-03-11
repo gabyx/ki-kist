@@ -194,36 +194,48 @@ to inspect what you can do.
 
 ```shell
 cd components/client
-echo "f73o6k&ntb9ojR@XmVgjazt%nae" > passphrase.txt # Do this only for testing!!!
-just client store --passphrase-file passphrase.txt
+
+credArgs=(--host "http://localhost:8080" \
+          --access-token todo \
+          --user-id demo)
+
+just client store \
+    ${credArgs[@]} \
+    --passphrase-file <(echo "f73o6k&ntb9ojR@XmVgjazt%nae")
 ```
+
+Note: The above `<(...)` is called process substitution to avoid writing the
+password into a file. Drop the `--passphrase-file` to have an interactive
+prompt.
 
 #### Retrieving a Key Pair
 
 ```shell
-cd components/client
-just client get --key-id "<key-id>"
+just client get \
+    ${credArgs[@]} \
+    --passphrase-file passphrase.txt
+    --key-id "<key-id>" \
+    --passphrase-file passphrase.txt
 ```
 
 #### Signing a Document
 
 ```shell
-cd components/client
 just client sign \
+    ${credArgs[@]} \
     --key-id "<key-id>" \
-    --file "Cargo.toml" \
+    --file "README.md" \
     --passphrase-file passphrase.txt
 ```
 
-This produces a signature file `Cargo.toml.sig`.
+This produces a signature file `README.md.sig`.
 
 #### Verifying a Signed Document
 
 ```shell
-cd components/client
 just client verify \
     --key-id "<key-id>" \
-    --file "Cargo.toml" \
+    --file "README.md" \
     --file-signature "Cargo.toml.sig" \
 ```
 

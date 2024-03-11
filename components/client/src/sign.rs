@@ -47,7 +47,7 @@ pub fn sign_file(
 
     info!(log, "Signing file '{}'...", file.display());
     let sig = secret_key.sign(&msg);
-    let sig_comment = "ki-krite signature from secret key (signify)";
+    let sig_comment = "ki-kist signature from secret key (signify)";
 
     let mut f = OpenOptions::new()
         .write(true)

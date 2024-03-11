@@ -73,13 +73,13 @@ strictest security measures possible. The following interactions happen:
 Using NoSQL over SQL is not such a debate for this key store. Both have its
 merits and drawbacks.
 
-| MongoDB                                                                                             | PostgreSQL                                                                                      |
-| --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| 😊 Scales nicer horizontally (more database nodes in other cluster can be added with ease)          | 😣 Scales only horizontally, a single powerful read/write instance and multiliple read replicas |
-| 😊 One record is a JSON Document which needs validation before write (after read) with JSON Schema  | 😊 Records are split into tables with structured data (columns have defined types)              |
-| Easier to work with but custom API (No SQL).                                                        | SQL is terse but standardized and shitty to work with.                                          |
-| Retrieval of documents follows [ACID](https://www.mongodb.com/basics/acid-transactions) properties. | Simple table updates follow [ACID](https://www.mongodb.com/basics/acid-transactions) properties |
-| Optimistic concurrency control with document version number needed when updating.                   | Row updates follow [ACID](https://www.mongodb.com/basics/acid-transactions) properties.         |
+| MongoDB                                                                                              | PostgreSQL                                                                                      |
+| ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| 😊 Scales nicer horizontally (more database nodes in other cluster can be added with ease)           | 😣 Scales only vertically, a single powerful read/write instance and multiliple read replicas   |
+| 😊 One record is a `json` document which needs validation before write (after read) with JSON Schema | 😊 Records are split into tables with structured data (columns have defined types)              |
+| Easier to work with but custom API (No SQL).                                                         | SQL is terse but standardized and shitty to work with.                                          |
+| Retrieval of documents follows [ACID](https://www.mongodb.com/basics/acid-transactions) properties.  | Simple table updates follow [ACID](https://www.mongodb.com/basics/acid-transactions) properties |
+| Optimistic concurrency control with document version number needed when updating.                    | Row updates follow [ACID](https://www.mongodb.com/basics/acid-transactions) properties.         |
 
 _TODO: Add references._
 

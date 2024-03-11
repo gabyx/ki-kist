@@ -74,6 +74,10 @@ test what="manual":
     @cd "{{root_dir}}/tests/{{what}}" && \
         just run
 
+client *args:
+    @cd components/client && \
+        just run {{args}}
+
 # Formatting.
 ###############################################################################
 format regex=".*":
