@@ -30,8 +30,6 @@ pub fn generate_asymmetric_key_pair(
 ) -> Result<AsymmetricKeyPair, Error> {
     info!(log, "Generate a new asymmetric key pair.");
 
-    // TODO: Remove this and flush the log first (how?)
-    sleep(Duration::from_secs_f64(0.01));
     let passphrase = get_passphrase(non_interactive, passphrase_file)?;
 
     info!(log, "Validate password ...");
