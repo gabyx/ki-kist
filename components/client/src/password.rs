@@ -3,6 +3,8 @@ use snafu::whatever;
 use std::{
     io::Read,
     path::{Path, PathBuf},
+    thread::sleep,
+    time::Duration,
 };
 
 /// Get a passphrase either from stdin or from the file.
@@ -28,6 +30,9 @@ pub fn get_passphrase(
 
 /// Read passphrase from stdin.
 fn read_passphrase(confirm: bool) -> Result<String, Error> {
+    // TODO: Remove this and flush the log first (how?)
+    sleep(Duration::from_secs_f64(0.01));
+
     let pass = rpassword::prompt_password("Enter passphrase: ")?;
 
     if confirm {

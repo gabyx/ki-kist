@@ -1,10 +1,13 @@
 use crate::password::validate_passphrase;
 
 use super::{error::Error, password::get_passphrase};
-use common::{keys::AsymmetricKeyPair, log::Logger};
+use common::{
+    keys::AsymmetricKeyPair,
+    log::{info, Logger},
+};
 use libsignify::{Codeable, NewKeyOpts, PrivateKey};
 use snafu::whatever;
-use std::path::PathBuf;
+use std::{path::PathBuf, thread::sleep, time::Duration};
 
 /// KDF stands for Key Derivation Function, and it is a cryptographic function used
 /// to derive one or more secret keys from a given input, typically a password or
@@ -25,8 +28,13 @@ pub fn generate_asymmetric_key_pair(
     non_interactive: bool,
     passphrase_file: &Option<PathBuf>,
 ) -> Result<AsymmetricKeyPair, Error> {
+    info!(log, "Generate a new asymmetric key pair.");
+
+    // TODO: Remove this and flush the log first (how?)
+    sleep(Duration::from_secs_f64(0.01));
     let passphrase = get_passphrase(non_interactive, passphrase_file)?;
 
+    info!(log, "Validate password ...");
     validate_passphrase(&passphrase)?;
 
     // Store the private key

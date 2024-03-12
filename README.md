@@ -193,8 +193,6 @@ to inspect what you can do.
 #### Storing a Key Pair
 
 ```shell
-cd components/client
-
 credArgs=(--host "http://localhost:8080" \
           --access-token todo \
           --user-id demo)

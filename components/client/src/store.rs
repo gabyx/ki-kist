@@ -18,6 +18,7 @@ pub fn store_key_pair(
     //
     let client = reqwest::blocking::Client::new();
 
+    info!(log, "Store key pair for user {user_id}");
     let res = client
         .put(format!("{}/api/v1/{}/keys", host_url, user_id))
         .json(&key)
