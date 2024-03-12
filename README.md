@@ -236,7 +236,7 @@ This produces a signature file `README.md.sig`.
 just client verify \
     --key-id "<key-id>" \
     --file "README.md" \
-    --file-signature "Cargo.toml.sig" \
+    --file-signature "README.md.sig" \
 ```
 
 ### Shutdown
