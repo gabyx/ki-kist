@@ -60,16 +60,16 @@ fn read_passphrase_file(passphrase_file: &Path) -> Result<String, Error> {
 }
 
 /// Validate a passphrase.
-pub fn validate_passphrase(passphrase: &str) -> Result<(), Error> {
+pub fn validate_passphrase(passphrase: &str) -> Result<f64, Error> {
     let analysis = passwords::analyzer::analyze(passphrase);
     let score = passwords::scorer::score(&analysis);
 
     if score < 80.0 {
         whatever!(
-            "Your passphrase score '{}' must be >= 80% to be considered safe.",
+            "Your passphrase score '{}/100' must be >= 80 to be considered safe.",
             score
         );
     }
 
-    return Ok(());
+    return Ok(score);
 }

@@ -7,7 +7,7 @@ use common::{
 };
 use libsignify::{Codeable, NewKeyOpts, PrivateKey};
 use snafu::whatever;
-use std::{path::PathBuf, thread::sleep, time::Duration};
+use std::path::PathBuf;
 
 /// KDF stands for Key Derivation Function, and it is a cryptographic function used
 /// to derive one or more secret keys from a given input, typically a password or
@@ -30,10 +30,12 @@ pub fn generate_asymmetric_key_pair(
 ) -> Result<AsymmetricKeyPair, Error> {
     info!(log, "Generate a new asymmetric key pair.");
 
+    info!(log, "Getting passphrase for private key:");
     let passphrase = get_passphrase(non_interactive, passphrase_file)?;
 
-    info!(log, "Validate password ...");
-    validate_passphrase(&passphrase)?;
+    info!(log, "Check password strength ...");
+    let score = validate_passphrase(&passphrase)?;
+    info!(log, "Password strength: {:.1}/100 (min. 80 needed)", score);
 
     // Store the private key
     let mut rng = rand_core::OsRng {};

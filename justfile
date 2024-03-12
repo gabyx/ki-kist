@@ -76,7 +76,7 @@ test what="manual":
 
 client *args:
     @cd components/client && \
-        just run {{args}}
+        just run --cwd "{{root_dir}}" {{args}}
 
 # Formatting.
 ###############################################################################

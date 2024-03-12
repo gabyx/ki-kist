@@ -25,6 +25,9 @@ struct Cli {
     #[arg(short, long, default_value_t = false)]
     non_interactive: bool,
 
+    #[arg(short, long)]
+    cwd: Option<PathBuf>,
+
     #[command(subcommand)]
     command: Subcommands,
 }
@@ -136,6 +139,11 @@ fn main() -> Result<(), error::Error> {
     let log = common::log::create_logger(false);
 
     let cli = Cli::parse();
+
+    if let Some(cwd) = cli.cwd {
+        std::env::set_current_dir(cwd)?
+    }
+
     match cli.command {
         Subcommands::Generate(args) => {
             generate_asymmetric_key_pair(
