@@ -202,9 +202,9 @@ just client store \
     --passphrase-file <(echo "f73o6k&ntb9ojR@XmVgjazt%nae")
 ```
 
-Note: The above `<(...)` is called process substitution to avoid writing the
-password into a file. Drop the `--passphrase-file` to have an interactive
-prompt.
+asdfasdf Note: The above `<(...)` is called process substitution to avoid
+writing the password into a file. Drop the `--passphrase-file` to have an
+interactive prompt.
 
 #### Retrieving a Key Pair
 

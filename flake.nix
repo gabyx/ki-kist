@@ -1,5 +1,5 @@
 {
-  description = "Md2PDF-Service";
+  description = "ki-kist";
 
   nixConfig = {
     substituters = [
